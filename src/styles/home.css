@@ -1,0 +1,32 @@
+body {
+    background-color: black;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+
+.dropdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    word-wrap: break-word; 
+    overflow: hidden; 
+    max-width: 250px; 
+}
+
+.dropdown-item .text-decoration-none {
+    flex-grow: 1; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+}
+
+.dropdown-item button {
+    margin-left: 10px; 
+}
+
+.dropdown-item:hover {
+    color: #1e2125;
+    background-color: #6a737b;
+}

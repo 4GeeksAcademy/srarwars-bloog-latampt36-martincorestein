@@ -1,45 +1,52 @@
-const getState = ({ getStore, getActions, setStore }) => {
-	return {
-		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
-		},
-		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+import { BASE_URL } from "../store/config";
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+const getState = ({ getStore, setStore }) => {
 
-				//reset the global store
-				setStore({ demo: demo });
-			}
-		}
-	};
+    return {
+        store: {
+            characters: [],
+            planets: [],
+            vehicles: [],
+            favorites: []
+        },
+        actions: {
+            loadData: async () => {
+                try {
+                    const fetchData = async (endpoint) => {
+                        const response = await fetch(`${BASE_URL}${endpoint}`);
+                        if (!response.ok) throw new Error(`Failed to fetch ${endpoint}`);
+                        const data = await response.json();
+                        return data.results || [];
+                    };
+
+                    const [characters, planets, vehicles] = await Promise.all([
+                        fetchData("people"),
+                        fetchData("planets"),
+                        fetchData("vehicles")
+                    ]);
+
+                    setStore({
+                        characters,
+                        planets,
+                        vehicles
+                    });
+                } catch (error) {
+                    console.error("Error loading data:", error.message);
+                }
+            },
+
+            toggleFavorite : (item) => {
+                const store = getStore();
+                const uniqueId = `${item.uid}-${item.type}`;
+                const isFavorite = store.favorites.some(fav => fav.uniqueId === uniqueId);
+                const updatedFavorites = isFavorite
+                  ? store.favorites.filter(fav => fav.uniqueId !== uniqueId)
+                  : [...store.favorites, { ...item, type: item.type, uniqueId }];
+                setStore({ favorites: updatedFavorites });
+              }
+              
+            }
+    };
 };
 
 export default getState;
